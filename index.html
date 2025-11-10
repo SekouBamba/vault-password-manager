@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vault Password Manager</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top-bar">
+    <h1>Vault Password Manager</h1>
+  </header>
+
+  <main class="container">
+    <nav class="tabs" role="tablist" aria-label="Main tabs">
+      <button id="tab-gen" class="tab active" data-target="generator">Generator</button>
+      <button id="tab-vault" class="tab" data-target="vault">Vault</button>
+      <button id="tab-settings" class="tab" data-target="settings">Settings</button>
+    </nav>
+
+    <section id="generator" class="panel active" role="tabpanel" aria-labelledby="tab-gen">
+      <h2>Password Generator</h2>
+      <form id="gen-form" class="card">
+        <label>
+          Site / Label
+          <input id="site" placeholder="Example: Youtube" />
+        </label>
+
+        <label>
+          Username or Email
+          <input id="user" placeholder="you@example.com" />
+        </label>
+
+        <div class="row">
+          <label>
+            Length
+            <input id="length" type="number" min="6" max="128" value="16" />
+          </label>
+
+          <label class="checkboxes">
+            <input type="checkbox" id="lower" checked /> lower
+            <input type="checkbox" id="upper" checked /> upper
+            <input type="checkbox" id="numbers" checked /> numbers
+            <input type="checkbox" id="symbols" checked /> symbols
+          </label>
+        </div>
+
+        <div class="row">
+          <button type="button" id="generate">Generate</button>
+          <button type="button" id="save">Save to Vault</button>
+          <button type="button" id="copy-gen">Copy</button>
+        </div>
+
+        <label>
+          Generated Password
+          <input id="generated" readonly />
+        </label>
+      </form>
+    </section>
+
+    <section id="vault" class="panel" role="tabpanel" aria-labelledby="tab-vault">
+      <h2>Saved Passwords</h2>
+      <div class="card" id="vault-card">
+        <div id="entries" class="entries"></div>
+        <div class="vault-actions row">
+          <button id="clear-all">Delete All</button>
+          <div class="dots">
+            <span class="dot"></span>
+            <span class="dot filled"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="settings" class="panel" role="tabpanel" aria-labelledby="tab-settings">
+      <h2>Settings</h2>
+      <div class="card settings-card">
+        <label class="row">
+          Dark Mode
+          <input type="checkbox" id="dark-mode" />
+        </label>
+
+        <label class="row">
+          Auto-copy on generate
+          <input type="checkbox" id="auto-copy" />
+        </label>
+
+        <button id="export-json">Export Vault (JSON)</button>
+        <button id="import-json">Import Vault (paste JSON)</button>
+        <textarea id="import-area" placeholder="Paste exported JSON here"></textarea>
+      </div>
+
+      <div class="card about-card">
+        <h3>About</h3>
+        <p>Vault Password Manager — client-side prototype. Data stored in <code>localStorage</code>.</p>
+        <p>Version 1.0</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">Built for class project • No backend — local only</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
