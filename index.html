@@ -1,105 +1,173 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Vault Password Manager</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Vault</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="top-bar">
-    <h1>Vault Password Manager</h1>
-  </header>
+    <!-- Shell keeps header, tabbed workspace, and footer aligned -->
+    <div class="app-shell">
+        <header class="hero-header">
+            <h1>Password Vault</h1>
+            <p>Generate strong passwords, store them locally, and keep everything in one organized workspace.</p>
+        </header>
 
-  <main class="container">
-    <nav class="tabs" role="tablist" aria-label="Main tabs">
-      <button id="tab-gen" class="tab active" data-target="generator">Generator</button>
-      <button id="tab-vault" class="tab" data-target="vault">Vault</button>
-      <button id="tab-settings" class="tab" data-target="settings">Settings</button>
-    </nav>
+        <main class="workspace">
+            <!-- Tab buttons to see which tool panel is visible eg. generator, vault, settings -->
+            <nav class="tabs" aria-label="Password tools" role="tablist">
+                <button class="tab-button active" type="button" role="tab" id="tab-generator" aria-controls="panel-generator" aria-selected="true" data-tab="generator">Generator</button>
+                <button class="tab-button" type="button" role="tab" id="tab-manager" aria-controls="panel-manager" aria-selected="false" data-tab="manager" tabindex="-1">Vault</button>
+                <button class="tab-button" type="button" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" data-tab="settings" tabindex="-1">Settings</button>
+            </nav>
 
-    <section id="generator" class="panel active" role="tabpanel" aria-labelledby="tab-gen">
-      <h2>Password Generator</h2>
-      <form id="gen-form" class="card">
-        <label>
-          Site / Label
-          <input id="site" placeholder="Example: Youtube" />
-        </label>
+            <!-- Live success/error feedback -->
+            <p id="statusMessage" class="status" role="status" aria-live="polite"></p>
 
-        <label>
-          Username or Email
-          <input id="user" placeholder="you@example.com" />
-        </label>
+            <!-- Generator panel -->
+            <section class="panel active" id="panel-generator" data-panel="generator" role="tabpanel" aria-labelledby="tab-generator">
+                <article class="card generator-card">
+                    <header class="card-header">
+                        <h2>Password Generator</h2>
+                    </header>
 
-        <div class="row">
-          <label>
-            Length
-            <input id="length" type="number" min="6" max="128" value="16" />
-          </label>
+                    <div class="generator-display">
+                        <input id="generatedPassword" type="text" placeholder="Password will appear here" readonly>
+                        <button id="copyGenerated" type="button" aria-label="Copy generated password">Copy</button>
+                    </div>
+                    <div class="range-wrapper">
+                        <label for="lengthSlider">Length: <span id="lengthValue">16</span></label>
+                        <input id="lengthSlider" type="range" min="8" max="40" value="16">
+                    </div>
 
-          <label class="checkboxes">
-            <input type="checkbox" id="lower" checked /> lower
-            <input type="checkbox" id="upper" checked /> upper
-            <input type="checkbox" id="numbers" checked /> numbers
-            <input type="checkbox" id="symbols" checked /> symbols
-          </label>
-        </div>
+                    <form id="generatorOptions" autocomplete="off">
+                        <div class="option-grid">
+                            <button type="button" class="option-pill option-toggle active" data-option="lowercase" aria-pressed="true">Lowercase</button>
+                            <button type="button" class="option-pill option-toggle active" data-option="uppercase" aria-pressed="true">Uppercase</button>
+                            <button type="button" class="option-pill option-toggle active" data-option="numbers" aria-pressed="true">Numbers</button>
+                            <button type="button" class="option-pill option-toggle" data-option="symbols" aria-pressed="false">Symbols</button>
+                        </div>
+                        <button id="generatePassword" type="submit">Generate</button>
+                    </form>
+                </article>
+            </section>
 
-        <div class="row">
-          <button type="button" id="generate">Generate</button>
-          <button type="button" id="save">Save to Vault</button>
-          <button type="button" id="copy-gen">Copy</button>
-        </div>
+        <!-- Vault panel slider shows -->
+        <section class="panel" id="panel-manager" data-panel="manager" role="tabpanel" aria-labelledby="tab-manager" hidden>
+            <div class="vault-slider" id="vaultSlider" tabindex="0" role="region" aria-label="Vault sections">
+                <article class="card vault-slide manager-card" data-slide="manage">
+                    <header class="card-header">
+                        <h2>Manage Vault</h2>
+                    </header>
+                    <form id="saveForm" autocomplete="off">
+                        <div class="form-row">
+                            <label for="entryLabel">Site Name</label>
+                            <input id="entryLabel" name="entryLabel" type="text" placeholder="Bank, streaming, etc." required>
+                        </div>
+                        <div class="form-row">
+                            <label for="entryUsername">Username or Email</label>
+                            <input id="entryUsername" name="entryUsername" type="text" placeholder="username@example.com" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="entryPassword">Password</label>
+                            <div class="password-input">
+                                <input id="entryPassword" name="entryPassword" type="password" placeholder="Generate or paste password here" required>
+                                <button id="togglePasswordVisibility" type="button" aria-label="Show password">Show</button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="useGenerated" type="button">Use Generated</button>
+                            <div class="form-actions-end">
+                                <button id="cancelEdit" class="ghost-button" type="button" hidden>Cancel Edit</button>
+                                <button id="saveEntryButton" type="submit">Save Entry</button>
+                            </div>
+                        </div>
+                    </form>
+                </article>
 
-        <label>
-          Generated Password
-          <input id="generated" readonly />
-        </label>
-      </form>
-    </section>
+                <article class="card vault-slide vault-card" data-slide="saved">
+                    <header class="card-header">
+                        <h2>Saved Passwords</h2>
+                        <button id="clearAll" type="button">Clear Vault</button>
+                    </header>
+                    <p id="emptyState" class="empty-state">You have not saved any passwords yet.</p>
+                    <ul id="entries" class="entries" aria-live="polite"></ul>
+                </article>
+            </div>
+        </section>
 
-    <section id="vault" class="panel" role="tabpanel" aria-labelledby="tab-vault">
-      <h2>Saved Passwords</h2>
-      <div class="card" id="vault-card">
-        <div id="entries" class="entries"></div>
-        <div class="vault-actions row">
-          <button id="clear-all">Delete All</button>
-          <div class="dots">
-            <span class="dot"></span>
-            <span class="dot filled"></span>
-          </div>
-        </div>
-      </div>
-    </section>
+            <!-- Settings panel groups -->
+            <section class="panel" id="panel-settings" data-panel="settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+                <div class="panel-grid settings-grid">
+                    <article class="card settings-card">
+                        <header class="card-header">
+                            <h2>Settings</h2>
+                        </header>
+                        <ul class="settings-list">
+                            <li class="settings-item">
+                                <div>
+                                    <p>Dark mode</p>
+                                    <small>Switch theme</small>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" id="darkModeToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </li>
+                            <li class="settings-item">
+                                <div>
+                                    <p>Accent color</p>
+                                    <small>Pick your highlight</small>
+                                </div>
+                                <div class="accent-select-wrapper">
+                                    <select id="accentSelect" class="accent-select" aria-label="Accent color">
+                                        <option value="#6366f1|#4f46e5">Indigo</option>
+                                        <option value="#ec4899|#db2777">Pink</option>
+                                        <option value="#14b8a6|#0d9488">Teal</option>
+                                        <option value="#f97316|#ea580c">Orange</option>
+                                        <option value="#0ea5e9|#0284c7">Sky</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <li class="settings-item">
+                                <div>
+                                    <p>Language</p>
+                                    <small>English</small>
+                                </div>
+                                <button class="chevron" type="button" disabled aria-disabled="true">&#8250;</button>
+                            </li>
+                            <li class="settings-item destructive">
+                                <div>
+                                    <p>Delete all data</p>
+                                    <small>Remove every saved password</small>
+                                </div>
+                                <button id="settingsDelete" type="button">Delete</button>
+                            </li>
+                        </ul>
+                    </article>
 
-    <section id="settings" class="panel" role="tabpanel" aria-labelledby="tab-settings">
-      <h2>Settings</h2>
-      <div class="card settings-card">
-        <label class="row">
-          Dark Mode
-          <input type="checkbox" id="dark-mode" />
-        </label>
+                    <article class="card about-card">
+                        <header class="card-header">
+                            <h2>About</h2>
+                         </header>
+                        <ul class="settings-list">
+                            <li class="settings-item">
+                                <div>
+                                    <p>Version</p>
+                                    <small>1.0</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
 
-        <label class="row">
-          Auto-copy on generate
-          <input type="checkbox" id="auto-copy" />
-        </label>
-
-        <button id="export-json">Export Vault (JSON)</button>
-        <button id="import-json">Import Vault (paste JSON)</button>
-        <textarea id="import-area" placeholder="Paste exported JSON here"></textarea>
-      </div>
-
-      <div class="card about-card">
-        <h3>About</h3>
-        <p>Vault Password Manager — client-side prototype. Data stored in <code>localStorage</code>.</p>
-        <p>Version 1.0</p>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">Built for class project • No backend — local only</footer>
-
-  <script src="script.js"></script>
+    <footer class="page-footer">
+        <small>Passwords are stored locally in this browser. Always back up critical credentials in a secure location.</small><br><small><i>Author -- Matthew Junkins and Sekou Bamba</i></small>
+    <br></footer>
+    <script src="script.js"></script>
 </body>
 </html>
